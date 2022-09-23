@@ -1,26 +1,24 @@
 const path = require('path');
-const htmlwebpackplugin = require('html-webpack-plugin');
-const minicssextractplugin = require('mini-css-extract-plugin');
-const copyplugin = require('copy-webpack-plugin');
-const cssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const { terserMinify } = require('terser-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
-const { CleanWebpackPlugin}=require('clean-webpack-plugin');
-
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].[contenthash].js',
-    assetModuleFilename:'assets/images/[hash][ext][query]',
+    assetModuleFilename: 'assets/images/[hash][ext][query]'
   },
   resolve: {
     extensions: ['.js'],
-    alias:{
-      '@utils': path.resolve(__dirname, 'src/utils'),
-      '@templates': path.resolve(__dirname, 'src/templates'),
+    alias: {
+      '@utils': path.resolve(__dirname, 'src/utils/'),
+      '@templates': path.resolve(__dirname, 'src/templates/'),
       '@styles': path.resolve(__dirname, 'src/styles/'),
       '@images': path.resolve(__dirname, 'src/assets/images/'),
     }
@@ -35,56 +33,56 @@ module.exports = {
         }
       },
       {
-        test:/\.css|.styl$/i,
-        use:[minicssextractplugin.loader,
-        'css-loader',
-        'stylus-loader'
-      ],
+        test: /\.css|.styl$/i,
+        use: [MiniCssExtractPlugin.loader,
+          'css-loader',
+          'stylus-loader'
+        ],
       },
       {
         test: /\.png/,
         type: 'asset/resource'
       },
       {
-        test:/\.(woff|woff2)$/,
-        use:{
-          loader:'url-loader',
-          options:{
-            limit:10000,
-            mimetype:"application/font-woff",
-            name:"[name].[contenthash].[ext]",
-            outputpath: "./assets/fonts/",
-            publicpath:"../assets/fonts/",
-            esmodule:false,
+        test: /\.(woff|woff2)$/,
+        use: {
+          loader: 'url-loader',
+          options: {
+            limit: 10000,
+            mimetype: "application/font-woff",
+            name: "[name].[contenthash].[ext]",
+            outputPath: "./assets/fonts/",
+            publicPath: "../assets/fonts/",
+            esModule: false,
           },
         }
       }
     ]
   },
-  plugins:[
-    new htmlwebpackplugin({
+  plugins: [
+    new HtmlWebpackPlugin({
       inject: true,
-      template:'./public/index.html',
-      filename:'./index.html'
+      template: './public/index.html',
+      filename: './index.html'
     }),
-    new minicssextractplugin({
-      filename:'assets/[name].[contenthash].css'
-  }),
-    new copyplugin({
-      patterns:[
+    new MiniCssExtractPlugin({
+      filename: 'assets/[name].[contenthash].css'
+    }),
+    new CopyPlugin({
+      patterns: [
         {
-          from:path.resolve(__dirname,"src","assets/images"),
-          to:"assets/images"
+          from: path.resolve(__dirname, "src", "assets/images"),
+          to: "assets/images"
         }
       ]
     }),
     new Dotenv(),
     new CleanWebpackPlugin(),
   ],
-  optimization:{
-    minimize:true,
-    minimizer:[
-      new cssMinimizerPlugin(),
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new CssMinimizerPlugin(),
       new TerserPlugin(),
     ]
   }
